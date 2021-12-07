@@ -1,55 +1,103 @@
-def makeMapToArr ():
+def makeMapToArr():
     maps = []
     mapFile = open("map.txt", "r")
+
     lines = mapFile.readlines()
+    map = []
     rowSize = 0
-    hall = 0
-    ball = 0
-    stage = []
-    position = []
+
     for line in lines:
         if 'Stage' in line or '=' in line:
-            if len(stage) > 0:
-                for i in range(len(stage)):
-                    while len(stage[i]) < rowSize:
-                        stage[i].append(' ') #stage1이 끝난 시점
-                print(f"가로크기: {rowSize}\n세로크기: {len(stage)}\n구멍의 수:{hall}\n공의 수 :{ball}\n플레이어 위치 ({position[0] + 1}, {position[1]}) ")
-                maps.append(stage)
-                stage = []
-                rowSize - 0
-                hall = 0
-                ball = 0
-                position = []
-            if '=' in line:
-                continue
+            if len(map) > 0 :
+                for i in range(len(map)):
+                    while len(map[i]) < rowSize:
+                        map[i].append(' ')
 
-            print(''.join(line))
+                maps.append(map)       
+                map = []
+                rowSize = 0
             continue
 
-        print(''.join(line))
         rowSize = max(len(line.rstrip()), rowSize)
         row = []
         for cell in line:
-            if cell == '#':
-                row.append('0')
-            elif cell == 'O':
-                row.append('1')
-                hall += 1
-            elif cell == 'o':
-                row.append('2')
-                ball += 1
-            elif cell == 'P':
-                row.append('3')
-                position.append(len(stage))
-                position.append(len(row))
-            elif cell == ' ':
+            if cell != '\n' :
                 row.append(cell)
-        stage.append(row)
+        map.append(row)
     return maps
 
 
+def Main ():
+    maps = makeMapToArr()
+    map = maps[1]
+    return map
+
+
+def printMap (map):
+    for row in map:
+        print(''.join(row))
+
+
+def playStage(map, stage_num):
+    print('Stage' + str(stage_num) + '\n')
+
+    myPos = []
+    for i in range(len(map)):
+        for j in range(len(map[i])):
+            if map[i][j] == 'P':
+                myPos = [i, j]
+    while True:
+        printMap(map)
+        commands = input('\n' + 'SOKOBAN> ').upper()
+
+
+        for command in commands:
+
+            move = [0, 0]
+            notice = ''
+            if command == 'Q':
+                print('Bye~')
+                exit()
+            elif command == 'W':
+                move = [-1, 0]
+                notice = '\nW: 위로 이동합니다.'
+            elif command == 'A':
+                move = [0, -1]
+                notice = '\nA: 왼쪽으로 이동합니다.'
+            elif command == 'S':
+                move = [1, 0]
+                notice = '\nS: 아래로 이동합니다.'
+            elif command == 'D':
+                move = [0, 1]
+                notice = '\nD: 오른쪽으로 이동합니다.'
+            else:
+                printImpossible(command, map)
+                continue
+
+            nextPos = [myPos[0] + move[0], myPos[1] + move[1]]
+            realNext = map[nextPos[0]][nextPos[1]]
+
+            if realNext == ' ':
+                map[nextPos[0]][nextPos[1]] = 'P'
+                map[myPos[0]][myPos[1]] = ' '
+                myPos = nextPos
+
+            else:
+                printImpossible(command, map)
+                continue
+
+            printMap(map)
+            print(notice + '\n')
+
+
+
+def printImpossible(command, map):
+    printMap(map)
+    print('\n' + command + ' (경고!) 해당 명령을 수행할 수 없습니다!\n')
 
 
 
 
-makeMapToArr()
+
+
+playStage(Main(), 2)
