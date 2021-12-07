@@ -109,6 +109,13 @@ def checkPosition (map, hallPos):
             elif map[i][j] == 'O':
                 hallPos.append([i, j])
 
+def finishCheck(map, hallPos):
+    for hall in hallPos:
+        if map[hall[0]][hall[1]] != 'o':
+            return False
+
+    return True
+
 
 
 
