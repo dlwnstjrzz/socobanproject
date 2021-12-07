@@ -29,25 +29,28 @@ def makeMapToArr():
 
 def Main ():
     maps = makeMapToArr()
+    for index, map in enumerate(maps):
+        playStage(map, index+1)
+    print('전체 게임을 클리어하셨습니다!\n축하드립니다!')
 
-    return map
+def printMap (map, hallPos):
 
+    for hall in hallPos:
+        if map[hall[0]][hall[1]] == ' ':
+            map[hall[0]][hall[1]] = 'O'
 
-def printMap (map):
     for row in map:
+
         print(''.join(row))
 
 
 def playStage(map, stage_num):
     print('Stage' + str(stage_num) + '\n')
+    moveCount = 0
 
-    myPos = []
-    for i in range(len(map)):
-        for j in range(len(map[i])):
-            if map[i][j] == 'P':
-                myPos = [i, j]
-    while True:
-        printMap(map)
+    myPos, hallPos = checkPosition(map)
+    while not finishCheck(map, hallPos):
+        printMap(map, hallPos)
         commands = input('\n' + 'SOKOBAN> ').upper()
 
         for command in commands:
@@ -70,35 +73,64 @@ def playStage(map, stage_num):
                 move = [0, 1]
                 notice = '\nD: 오른쪽으로 이동합니다.'
             else:
-                printImpossible(command, map)
+                printImpossible(command, map, hallPos)
                 continue
 
             nextPos = [myPos[0] + move[0], myPos[1] + move[1]]
-            realNext = map[nextPos[0]][nextPos[1]]
+            if rightRange(map, nextPos):
+                realNext = map[nextPos[0]][nextPos[1]]
 
-            if realNext == ' ':
-                map[nextPos[0]][nextPos[1]] = 'P'
-                map[myPos[0]][myPos[1]] = ' '
-                myPos = nextPos
+                if realNext == ' ' or realNext == 'O':
+                    map[nextPos[0]][nextPos[1]] = 'P'
+                    map[myPos[0]][myPos[1]] = ' '
+                    myPos = nextPos
+                elif realNext == '#':
+                    printImpossible(command, map, hallPos)
+                    continue
+                elif realNext == 'o':
+                    nextNextPos = [nextPos[0] + move[0], nextPos[1] + move[1]]
+                    if rightRange(map, nextNextPos):
+                        realNextNext = map[nextNextPos[0]][nextNextPos[1]]
+                        if realNextNext == ' ':
+                            map[nextNextPos[0]][nextNextPos[1]] = 'o'
+                            map[nextPos[0]][nextPos[1]] = 'P'
+                            map[myPos[0]][myPos[1]] = ' '
+                            myPos = nextPos
+                        elif realNextNext == 'O':
+                            map[nextNextPos[0]][nextNextPos[1]] = '0'
+                            map[nextPos[0]][nextPos[1]] = 'P'
+                            map[myPos[0]][myPos[1]] = ' '
+                            myPos = nextPos
+                        else:
+                            printImpossible(command, map, hallPos)
+                            continue
+                    else:
+                        printImpossible(command, map, hallPos)
+                        continue
+
+
 
             else:
-                printImpossible(command, map)
+                printImpossible(command, map, hallPos)
                 continue
 
-            printMap(map)
+            printMap(map, hallPos)
             print(notice + '\n')
+            moveCount += 1
+    print('빠밤! Stage ' + str(stage_num) + ' 클리어!')
+    print('턴수: ' + str(moveCount) + '\n')
 
 
-
-def printImpossible(command, map):
-    printMap(map)
+def printImpossible(command, map, hallPos):
+    printMap(map, hallPos)
     print('\n' + command + ' (경고!) 해당 명령을 수행할 수 없습니다!\n')
 
 
+def rightRange(map, pos):
+    return 0 <= pos[0] and pos[0] < len(map) and 0 <= pos[1] and pos[1] < len(map[0])
 
 
-
-def checkPosition (map, hallPos):
+def checkPosition (map):
     myPos = []
     hallPos = []
 
@@ -108,16 +140,15 @@ def checkPosition (map, hallPos):
                 myPos = [i, j]
             elif map[i][j] == 'O':
                 hallPos.append([i, j])
+    return myPos, hallPos
 
 def finishCheck(map, hallPos):
     for hall in hallPos:
-        if map[hall[0]][hall[1]] != 'o':
+        if map[hall[0]][hall[1]] != '0':
             return False
 
     return True
 
 
+Main()
 
-
-
-playStage(Main(), 2)
