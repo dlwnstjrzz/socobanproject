@@ -13,7 +13,7 @@ def makeMapToArr():
                     while len(map[i]) < rowSize:
                         map[i].append(' ')
 
-                maps.append(map)       
+                maps.append(map)
                 map = []
                 rowSize = 0
             continue
@@ -29,7 +29,7 @@ def makeMapToArr():
 
 def Main ():
     maps = makeMapToArr()
-    map = maps[1]
+
     return map
 
 
@@ -49,7 +49,6 @@ def playStage(map, stage_num):
     while True:
         printMap(map)
         commands = input('\n' + 'SOKOBAN> ').upper()
-
 
         for command in commands:
 
@@ -95,6 +94,20 @@ def printImpossible(command, map):
     printMap(map)
     print('\n' + command + ' (경고!) 해당 명령을 수행할 수 없습니다!\n')
 
+
+
+
+
+def checkPosition (map, hallPos):
+    myPos = []
+    hallPos = []
+
+    for i in range(len(map)):
+        for j in range(len(map[i])):
+            if map[i][j] == 'P':
+                myPos = [i, j]
+            elif map[i][j] == 'O':
+                hallPos.append([i, j])
 
 
 
