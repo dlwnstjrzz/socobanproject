@@ -72,14 +72,18 @@ def playStage(map, stage_num):
             elif command == 'D':
                 move = [0, 1]
                 notice = '\nD: 오른쪽으로 이동합니다.'
+            elif command == 'R':
+                Main()
             else:
                 printImpossible(command, map, hallPos)
                 continue
 
             nextPos = [myPos[0] + move[0], myPos[1] + move[1]]
             if rightRange(map, nextPos):
+
                 realNext = map[nextPos[0]][nextPos[1]]
 
+                nextNextPos = [nextPos[0] + move[0], nextPos[1] + move[1]]
                 if realNext == ' ' or realNext == 'O':
                     map[nextPos[0]][nextPos[1]] = 'P'
                     map[myPos[0]][myPos[1]] = ' '
@@ -87,8 +91,16 @@ def playStage(map, stage_num):
                 elif realNext == '#':
                     printImpossible(command, map, hallPos)
                     continue
+                elif realNext == '0':
+
+                    if rightRange(map, nextNextPos):
+                        realNextNext = map[nextNextPos[0]][nextNextPos[1]]
+                        if realNextNext == ' ':
+                            map[nextNextPos[0]][nextNextPos[1]] = 'o'
+                            map[nextPos[0]][nextPos[1]] = 'P'
+                            map[myPos[0]][myPos[1]] = ' '
+                            myPos = nextPos
                 elif realNext == 'o':
-                    nextNextPos = [nextPos[0] + move[0], nextPos[1] + move[1]]
                     if rightRange(map, nextNextPos):
                         realNextNext = map[nextNextPos[0]][nextNextPos[1]]
                         if realNextNext == ' ':
@@ -107,8 +119,6 @@ def playStage(map, stage_num):
                     else:
                         printImpossible(command, map, hallPos)
                         continue
-
-
 
             else:
                 printImpossible(command, map, hallPos)
@@ -148,6 +158,7 @@ def finishCheck(map, hallPos):
             return False
 
     return True
+
 
 
 Main()
